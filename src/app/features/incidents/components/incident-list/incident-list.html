@@ -1,0 +1,58 @@
+@if (!incidents.length) {
+  <div class="alert alert-light border text-center py-4">No hay incidentes para mostrar.</div>
+} @else {
+  <div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>ID</th>
+              <th>Título</th>
+              <th>Descripción</th>
+              <th>Service</th>
+              <th>Severidad</th>
+              <th>Estado</th>
+              <th>Creado</th>
+              <th>Actualizado</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (incident of incidents; track trackByIncidentId($index, incident)) {
+              <tr>
+                <td class="fw-semibold">{{ incident.id }}</td>
+                <td>{{ incident.title }}</td>
+                <td class="text-truncate-cell">{{ incident.description }}</td>
+                <td>{{ incident.serviceId }}</td>
+                <td>
+                  <span
+                    class="badge rounded-pill"
+                    [ngClass]="getSeverityBadgeClass(incident.severity)"
+                  >
+                    {{ incident.severity }}
+                  </span>
+                </td>
+                <td>
+                  <span class="badge rounded-pill" [ngClass]="getStatusBadgeClass(incident.status)">
+                    {{ incident.status }}
+                  </span>
+                </td>
+                <td>{{ incident.createdAt | date: 'short' }}</td>
+                <td>{{ incident.updatedAt | date: 'short' }}</td>
+                <td>
+                  <a
+                    [routerLink]="['/incidents', incident.id]"
+                    class="btn btn-sm btn-outline-primary"
+                  >
+                    Ver
+                  </a>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+}

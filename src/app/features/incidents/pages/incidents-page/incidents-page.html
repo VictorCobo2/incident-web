@@ -1,0 +1,143 @@
+<div class="container py-4">
+  <div class="mb-4">
+    <h1 class="h3 mb-1">Incidentes</h1>
+    <p class="text-muted mb-0">Listado general de incidentes registrados</p>
+  </div>
+
+  <form class="card shadow-sm border-0 mb-4" [formGroup]="filterForm">
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-3">
+          <label class="form-label">Estado</label>
+          <select class="form-select" formControlName="status">
+            <option value="">Todos</option>
+            <option value="OPEN">OPEN</option>
+            <option value="IN_PROGRESS">IN_PROGRESS</option>
+            <option value="RESOLVED">RESOLVED</option>
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">Severidad</label>
+          <select class="form-select" formControlName="severity">
+            <option value="">Todas</option>
+            <option value="LOW">LOW</option>
+            <option value="MEDIUM">MEDIUM</option>
+            <option value="HIGH">HIGH</option>
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">Service ID</label>
+          <input
+            type="text"
+            class="form-control"
+            formControlName="serviceId"
+            placeholder="payments-api"
+          />
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">Búsqueda</label>
+          <input
+            type="text"
+            class="form-control"
+            formControlName="q"
+            placeholder="Buscar por título"
+          />
+        </div>
+
+        <div class="col-md-2">
+          <label class="form-label">Tamaño página</label>
+          <select class="form-select" formControlName="pageSize">
+            <option [value]="5">5</option>
+            <option [value]="10">10</option>
+            <option [value]="20">20</option>
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">Orden</label>
+          <select class="form-select" formControlName="sort">
+            <option value="createdAt_desc">Más recientes</option>
+            <option value="createdAt_asc">Más antiguos</option>
+          </select>
+        </div>
+
+        <div class="col-md-7 d-flex align-items-end gap-2">
+          <button class="btn btn-primary" type="submit">Aplicar filtros</button>
+
+          <button class="btn btn-outline-secondary" type="button" (click)="clearFilters()">
+            Limpiar
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  @if (vm$ | async; as vm) {
+    @if (vm.errorMessage) {
+      <div class="alert alert-danger" role="alert">
+        {{ vm.errorMessage }}
+      </div>
+    }
+
+    @if (vm.loading) {
+      <div class="d-flex justify-content-center py-5">
+        <div class="spinner-border" role="status">
+          <span class="visually-hidden">Cargando...</span>
+        </div>
+      </div>
+    } @else {
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h1 class="h3 mb-1">Incidentes</h1>
+          <p class="text-muted mb-0">Listado general de incidentes registrados</p>
+        </div>
+
+        <a routerLink="/incidents/new" class="btn btn-primary"> Nuevo incidente </a>
+      </div>
+      <app-incident-list [incidents]="vm.incidents"></app-incident-list>
+
+      @if (vm.meta) {
+        <div
+          class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mt-3 gap-3"
+        >
+          <div class="text-muted">
+            Página {{ vm.meta.page }} de {{ vm.meta.totalPages }} · Total registros:
+            {{ vm.meta.total }}
+          </div>
+
+          <div class="btn-group">
+            <button
+              class="btn btn-outline-primary"
+              [disabled]="vm.meta.page <= 1"
+              (click)="goToPage(vm.meta.page - 1, vm.meta.totalPages)"
+            >
+              Anterior
+            </button>
+
+            @for (page of getPages(vm.meta.totalPages); track page) {
+              <button
+                class="btn"
+                [class.btn-primary]="page === vm.meta.page"
+                [class.btn-outline-primary]="page !== vm.meta.page"
+                (click)="goToPage(page, vm.meta.totalPages)"
+              >
+                {{ page }}
+              </button>
+            }
+
+            <button
+              class="btn btn-outline-primary"
+              [disabled]="vm.meta.page >= vm.meta.totalPages"
+              (click)="goToPage(vm.meta.page + 1, vm.meta.totalPages)"
+            >
+              Siguiente
+            </button>
+          </div>
+        </div>
+      }
+    }
+  }
+</div>

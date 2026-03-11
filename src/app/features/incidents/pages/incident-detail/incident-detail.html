@@ -1,0 +1,115 @@
+<div class="container py-4">
+  @if (vm$ | async; as vm) {
+    @if (vm) {
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h2 class="h3 mb-1">{{ vm.incident.title }}</h2>
+          <p class="text-muted mb-0">{{ vm.incident.description }}</p>
+        </div>
+
+        <a routerLink="/incidents" class="btn btn-outline-secondary">
+          Volver
+        </a>
+      </div>
+
+      <div class="card mb-4 shadow-sm border-0">
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-3">
+              <strong>ID</strong>
+              <div>{{ vm.incident.id }}</div>
+            </div>
+
+            <div class="col-md-2">
+              <strong>Severidad</strong>
+              <div class="mt-1">
+                <span class="badge rounded-pill" [ngClass]="getSeverityClass(vm.incident.severity)">
+                  {{ vm.incident.severity }}
+                </span>
+              </div>
+            </div>
+
+            <div class="col-md-2">
+              <strong>Estado</strong>
+              <div class="mt-1">
+                <span class="badge rounded-pill" [ngClass]="getStatusClass(vm.incident.status)">
+                  {{ vm.incident.status }}
+                </span>
+              </div>
+            </div>
+
+            <div class="col-md-2">
+              <strong>Service ID</strong>
+              <div>{{ vm.incident.serviceId }}</div>
+            </div>
+
+            <div class="col-md-3">
+              <strong>Creado</strong>
+              <div>{{ vm.incident.createdAt | date:'short' }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-4 shadow-sm border-0">
+        <div class="card-header">
+          <strong>Cambio de estado</strong>
+        </div>
+
+        <div class="card-body">
+          <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+              <label class="form-label">Nuevo estado</label>
+              <select class="form-select" [(ngModel)]="selectedStatus">
+                <option value="OPEN">OPEN</option>
+                <option value="IN_PROGRESS">IN_PROGRESS</option>
+                <option value="RESOLVED">RESOLVED</option>
+              </select>
+            </div>
+
+            <div class="col-md-4">
+              <button
+                class="btn btn-primary"
+                [disabled]="updatingStatus()"
+                (click)="updateStatus(vm.incident.status, vm.incident.id)"
+              >
+                {{ updatingStatus() ? 'Actualizando...' : 'Actualizar estado' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card shadow-sm border-0">
+        <div class="card-header">
+          <strong>Timeline</strong>
+        </div>
+
+        <div class="card-body">
+          @if (!vm.timeline.length) {
+            <p class="text-muted mb-0">No hay eventos registrados.</p>
+          } @else {
+            @for (event of vm.timeline; track $index) {
+              <div class="timeline-item mb-3">
+                <div class="d-flex justify-content-between flex-wrap gap-2">
+                  <strong>{{ event.eventType }}</strong>
+                  <small class="text-muted">
+                    {{ event.createdAt | date:'medium' }}
+                  </small>
+                </div>
+
+                <div class="text-muted small mt-1">
+                  Estado anterior:
+                  <strong>{{ event.payload.previousStatus ?? 'None' }}</strong>
+                  →
+                  Estado nuevo:
+                  <strong>{{ event.payload.newStatus }}</strong>
+                </div>
+              </div>
+            }
+          }
+        </div>
+      </div>
+    }
+  }
+</div>
